@@ -1,0 +1,117 @@
+#!/bin/bash
+#
+# do litle harm.
+/usr/bin/renice 19 -p $$ > /dev/null 2>&1
+#
+#  This script assumes that:
+#   You have ISOs in ~/build/centos7_simple_kickstart/isos
+#   Your VM's will live in ~/build/centos7_simple_kickstart/vm/__instance_name__
+#
+#  We are avoiding Vagrant on purpose so that you may
+#  create this same environment anywhere.
+#
+# We need the extensionpack to get PXE for installing the first host, the kickstart server itself.
+#  You can avoid that requirement by manually hitting the tab key when the ISO boots,
+#  backing over the word "quiet" and typing:
+#   cmdline nicdelay=10 ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg
+# ^  ^  ^  ^  ^
+#  I AM SKIPPING THIS PROCESS and folks will have to manually
+#  type 1 line when the FIRST VM boots for the first time.
+#
+# Our local "boot-strap" server is our laptop and it will have a private IP of 192.168.120.1
+#
+# Our Kickstart environment will have a private network of 192.168.120.0/24  (254 IP's usable)
+#
+# Our Kickstart server will be 192.168.120.10
+#
+# Our VM's will be in the 192.168.120.100-192.168.120.220 range.
+#  Use 192.168.120.11 through 192.168.120.99 for static assignments in your testing,
+#  or reserve the IP addresses in the dhcpd config.  Examples provided.
+#
+# Repo: https://github.com/ohdns/centos7_simple_kickstart.git
+#
+PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS
+MYNAME="c7_small_"
+YOURNUMBER="$1"
+export PATH USER MYNAME YOURNUMBER
+
+
+
+######################################### Create vboxnet0 local interface
+VBOXNETEXISTS=`VBoxManage list -l hostonlyifs | grep -c vboxnet0`
+if [ ${VBOXNETEXISTS} -lt 1 ] ; then
+  printf "\n\nCreating HostOnlyIF\n"
+  VBoxManage hostonlyif create
+  sleep 2
+  printf "Setting vboxnet0 to 192.168.120.1 netmask 255.255.255.0\n\n"
+  VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.120.1 --netmask 255.255.255.0
+  sleep 2
+fi
+######################################### Create vboxnet0 local interface
+
+
+NUMBER_VALIDATE=`echo "${YOURNUMBER}" | egrep -c "^[0-9]{1,2}$"`
+if [ ${NUMBER_VALIDATE} -lt 1 ] || [ ${NUMBER_VALIDATE} -gt 1 ] ; then
+printf "\n\nI see ${NUMBER_VALIDATE} valid numbers in ${YOURNUMBER}\n\nPlease select a positive integer between 1 and 64.\n\n"
+exit 2
+fi
+
+if [ ${YOURNUMBER} -gt 64 ] ; then
+printf "\n\nYou are asking to create more than 64 VM's.  Something is probably wrong.  Refusing to run.\n\n"
+exit 2
+fi
+
+
+# Lets background these and just hope we dont nuke your poor CPU and disk.
+for MYNUMBER in `seq -w ${YOURNUMBER}`
+do
+
+######################################### Create small VM
+# VM1, small VMs
+printf "\n\nCreating ${MYNAME}${MYNUMBER} in base folder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}\n\n"
+VBoxManage createvm --name ${MYNAME}${MYNUMBER} --ostype RedHat_64 --basefolder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER} --register
+if [ ! -d ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER} ] ; then
+mkdir -p ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}
+fi
+if [ ! -f ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi ] ; then
+VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi" --size 4096 --variant Fixed
+fi
+VBoxManage storagectl ${MYNAME}${MYNUMBER} --name mysata --add sata --controller IntelAHCI --portcount 2 --hostiocache off
+VBoxManage storageattach ${MYNAME}${MYNUMBER} --storagectl mysata --port 0 --medium ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi --type hdd
+
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --vrde off
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --usb off
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --clipboard disabled
+# THIS REQUIRES Headless Start # VBoxManage modifyvm ${MYNAME}${MYNUMBER} --graphicscontroller none
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --memory 1200 --vram 12 --cpus 1 --cpuexecutioncap 80
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --firmware bios
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --audio none --chipset ich9
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nic1 hostonly --hostonlyadapter1 vboxnet0 --nictype1 82545EM --macaddress1 auto
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nicpromisc1 allow-all
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nicbootprio1 1
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --boot1 disk --boot2 net --boot3 none --boot4 none
+######################################### Create small VM
+
+VBoxManage startvm ${MYNAME}${MYNUMBER} &
+
+done
+
+#
+# VBoxHeadless --startvm ${MYNAME}${MYNUMBER} --boot1 net
+# VBoxManage controlvm ${MYNAME}${MYNUMBER} poweron
+# VBoxManage modifyvm ${MYNAME}${MYNUMBER} --dvd none
+# VBoxManage controlvm ${MYNAME}${MYNUMBER} poweroff
+
+
+exit 0;
+
+
+# generate MAC ourselves so we can use it later if we need it.
+#VM0MAC1=$(echo ${VM0}_${USER}_int1 | openssl md5 | awk {'print $NF'} | sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')
+#VM0MAC2=$(echo ${VM0}_${USER}_int2 | openssl md5 | awk {'print $NF'} | sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')
+#VM0MAC1_NOCOLON=`echo ${VM0MAC1} | sed s/\://g`
+#VM0MAC2_NOCOLON=`echo ${VM0MAC2} | sed s/\://g`
+#VM0MAC1_HYPHEN=`echo ${VM0MAC1} | sed s/\:/\-/g`
+#VM0MAC2_HYPHEN=`echo ${VM0MAC2} | sed s/\:/\-/g`
+#
+
