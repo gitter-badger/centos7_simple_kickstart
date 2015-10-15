@@ -75,6 +75,11 @@ where the application logs should reside. <i>i.e. /data/application_name/logs</i
 or better, <b>use docker!</b> to keep the OS pristine and easy to patch.<br />
 and what permissions are required for the application to run and for <b>the right folks</b> to view logs without sudo.</li>
 <li>Aside from the Ansible account, avoid SSH key trusts when you can. Proper automation is derrived from codified instructions that occur in the data-center, not from a laptop.</li>
+
+<li>Avoid enabling root login via ssh.  In fact, avoid logging into any VM's if you can.<br />
+The base configuration belongs in kickstart and customization needs to be done in a configuration management and orchestration system.<br />
+All services need to be initialized by a proper startup script when the server OS starts up.</li>
+
 </ul>
 </p>
 
