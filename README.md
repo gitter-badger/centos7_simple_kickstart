@@ -87,17 +87,17 @@ All services need to be initialized by a proper startup script when the server O
 # Known Issues and Limitations:
 <p>
 <ul>
-<li>NTPD will not be able to reach public NTP servers, as this setup does not create a public interface on the kickstart server.<br />
-You could modify the kickstart and the VirtualBox commands to have a NAT interface, if you are certain you understand the risks.<br />
-Or we can peer with the laptop.</li>
+<li>To use NTP from the kickstart server to our laptop, we have to break our own rule and use either root or sudo to modify /private/etc/ntp-restrict.conf on our laptop to allow a query.<br />
+<code>sudo echo "restrict 192.168.120.0/24" >> /private/etc/ntp-restrict.conf</code><br /></li>
 
-<li>There is one manual step to create the DHCP/PXE/Yum/Kickstart server.  This is probably ok, since we should not be doing this often.</li>
+<li>There is one manual step to create the DHCP/PXE/Yum/Kickstart server.  This is <i>probably</i> ok, since we should not be doing this often.</li>
 
 <li>This method currently lacks end-to-end validation of the RPM GPG signatures.  (Work In Progress)</li>
 
 <li>You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Ansible user (zod).</li>
 
 <li>There is currently a bit of customization in the kickstart files.  This will be moved into Ansible as this document and repo evolve to include managing these hosts with Ansible.</li>
+
 <li>We currently lack the Ansible VM role and Ansible configuration.  That is our next step in this excersize.</li>
 </ul>
 </p>
