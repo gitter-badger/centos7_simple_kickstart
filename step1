@@ -233,7 +233,16 @@ read only = yes
 
 zzzRSYNCzzz
 
+for mysync in `seq 3`
+do
+RSYNCRUNNING=`netstat -an | grep -c 10873`
+if [ ${RSYNCRUNNING} -lt 1 ] ; then
+rm -f ${HOME}/build/centos7_simple_kickstart/rsync.pid
+sync
 rsync --daemon --ipv4 --address=192.168.120.1 --port=10873 --config=${HOME}/build/centos7_simple_kickstart/scripts/rsyncd.conf
+sleep ${mysync}
+fi
+done
 ######################################### Start local rsync server on vboxnet0
 
 
