@@ -40,6 +40,7 @@
 
 <li><u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
  ... or don't.  The default password for zod and root will be <b>centos7</b><br />
+<b>zod</b> will be the Ansible automation account; and temporarily, the way you ssh to your VM.<br />
 You should also replace the SSH Public Key in the c7 .cfg files with your public key.<br />
 Please <b>do not</b> use this hash anywhere that contains sensitive data or build automation.</li>
 
