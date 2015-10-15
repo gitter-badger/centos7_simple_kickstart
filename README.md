@@ -71,9 +71,9 @@ Use audit2allow, audit2why or grep through /var/log/audit/audit.log to see why s
 <li>For custom applications, clearly define:<br />
 where the application should be installed. <i>i.e. /opt/application_name/{etc,bin,sbin,var}</i><br />
 where the application logs should reside. <i>i.e. /data/application_name/logs</i><br />
-what permissions are required for the application to run and for <b>the right folks</b> to view logs without sudo.</li>
+or better, <b>use docker!</b> to keep the OS pristine and easy to patch.<br />
+and what permissions are required for the application to run and for <b>the right folks</b> to view logs without sudo.</li>
 <li>Aside from the Ansible account, avoid SSH key trusts when you can. Proper automation is derrived from codified instructions that occur in the data-center, not from a laptop.</li>
-
 </ul>
 </p>
 
@@ -87,10 +87,11 @@ Or we can peer with the laptop.</li>
 
 <li>There is one manual step to create the DHCP/PXE/Yum/Kickstart server.  This is probably ok, since we should not be doing this often.</li>
 
-<li>This method currently lacks end-to-end validation of the RPM GPG signatures.  (WIP)</li>
+<li>This method currently lacks end-to-end validation of the RPM GPG signatures.  (Work In Progress)</li>
 
 <li>You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Ansible user (zod).</li>
 
 <li>There is currently a bit of customization in the kickstart files.  This will be moved into Ansible as this document and repo evolve to include managing these hosts with Ansible.</li>
+<li>We currently lack the Ansible VM role and Ansible configuration.  That is our next step in this excersize.</li>
 </ul>
 </p>
