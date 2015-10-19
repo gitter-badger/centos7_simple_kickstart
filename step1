@@ -193,12 +193,14 @@ zzzAPACHEzzz
 
 
 /usr/sbin/httpd -T -f ~/build/centos7_simple_kickstart/scripts/httpd.conf -E ~/build/centos7_simple_kickstart/logs/apache_startup.log -k stop > /dev/null 2>&1
+/usr/sbin/httpd -T -f ~/build/centos7_simple_kickstart/scripts/httpd.conf -E ~/build/centos7_simple_kickstart/logs/apache_startup.log -k stop > /dev/null 2>&1
+rm -f ~/build/centos7_simple_kickstart/httpd.pid
 sync
-for patchy in `seq 3`
+sleep 1
+for patchy in `seq 7`
 do
  APACHECOUNT=`netstat -an | grep -c 8888`
  if [ ${APACHECOUNT} -lt 1 ] ; then
- printf "\n\nStarting local apache server on 192.168.120.1:8888\n\n"
  /usr/sbin/httpd -T -f ~/build/centos7_simple_kickstart/scripts/httpd.conf -E ~/build/centos7_simple_kickstart/logs/apache_startup.log -k start
  sync
  sleep ${patchy}
@@ -233,11 +235,11 @@ read only = yes
 
 zzzRSYNCzzz
 
-for mysync in `seq 3`
+for mysync in `seq 7`
 do
 RSYNCRUNNING=`netstat -an | grep -c 10873`
 if [ ${RSYNCRUNNING} -lt 1 ] ; then
-rm -f ${HOME}/build/centos7_simple_kickstart/rsync.pid
+rm -f ${HOME}/build/centos7_simple_kickstart/tmp/rsync*
 sync
 rsync --daemon --ipv4 --address=192.168.120.1 --port=10873 --config=${HOME}/build/centos7_simple_kickstart/scripts/rsyncd.conf
 sleep ${mysync}
