@@ -99,5 +99,15 @@ All services need to be initialized by a proper startup script when the server O
 <li>There is currently a bit of customization in the kickstart files.  This will be moved into Ansible as this document and repo evolve to include managing these hosts with Ansible.</li>
 
 <li>We currently lack the Ansible VM role and Ansible configuration.  That is our next step in this excersize.</li>
+
+<li>Since we are not using Vagrant, you would have to script startup/shutdown yourself.<br /><br />
+<code>PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS;export PATH</code><br /><br />
+Clean / Graceful Power Off:<br />
+<code>VBoxManage controlvm c7_small_1 acpipowerbutton</code><br /><br />
+Power On:<br />
+<code>VBoxManage startvm c7_small_1</code><br /><br />
+Power On Headless (No GUI / console):<br />
+<code>VBoxManage startvm --type headless c7_small_1</code><br /><br />
+</li>
 </ul>
 </p>
