@@ -87,7 +87,7 @@ All services need to be initialized by a proper startup script when the server O
 # Known Issues and Limitations:
 <p>
 <ul>
-<li>To use NTP from the kickstart server to our laptop, we have to break our own rule and use either root or sudo to modify /private/etc/ntp-restrict.conf on our laptop to allow a query.<br />
+<li>To use NTP from the kickstart server to our laptop, we have to break our own rule one time and use either root or sudo to modify /private/etc/ntp-restrict.conf on our laptop to allow a query.<br />
 <code>sudo echo "restrict 192.168.120.0/24" >> /private/etc/ntp-restrict.conf ; sudo pkill -HUP ntpd</code><br /></li>
 
 <li>There is one manual step to create the DHCP/PXE/Yum/Kickstart server.  This is <i>probably</i> ok, since we should not be doing this often.</li>
