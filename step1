@@ -30,7 +30,7 @@
 #
 # Repo: https://github.com/ohdns/centos7_simple_kickstart.git
 #
-PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS
+PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS:/bin:/sbin:/usr/bin:/usr/sbin
 VM0="c7_small_kickstart"
 export PATH USER VM0
 
@@ -71,6 +71,33 @@ export PATH USER VM0
 
 
 
+######################################### Create vboxnet0 local interface
+# VBox is slow to instantiate the interfaces and will return a result code before it completes...
+for vboxnet in `seq 3`
+do
+VBOXNETEXISTS=`VBoxManage list -l hostonlyifs | grep -c vboxnet0`
+if [ ${VBOXNETEXISTS} -lt 1 ] ; then
+  printf "\n\nCreating HostOnlyIF\n"
+  VBoxManage hostonlyif create
+  sleep ${vboxnet}
+fi
+done
+#
+for net0ip in `seq 3`
+do
+VBOXNETCONFIGURED=`VBoxManage list -l hostonlyifs | grep -c "192\.168\.120\.1"`
+if [ ${VBOXNETCONFIGURED} -lt 1 ] ; then
+  printf "Setting vboxnet0 to 192.168.120.1 netmask 255.255.255.0\n\n"
+  VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.120.1 --netmask 255.255.255.0
+  sleep ${net0ip}
+fi
+done
+######################################### Create vboxnet0 local interface
+
+
+
+
+
 ######################################### CENTOS EPEL Repo exist? Repo current? If not, create or update it.
 RECENTSYNC=`find ${HOME}/build/centos7_simple_kickstart/www/html/mirror/ -name localsync.log -mtime -7 -type f 2>/dev/null | grep -c localsync`
 if [ ! -d ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/updates ] || [ ${RECENTSYNC} -lt 1 ] ; then
@@ -85,9 +112,9 @@ rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ 
 date >> ${HOME}/build/centos7_simple_kickstart/www/html/mirror/localsync.log 
 #
 curl -A Mozilla -s https://wiki.centos.org/Manuals/ReleaseNotes/CentOS7 -o ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html
-shasum -a 256 ~/build/centos7_simple_kickstart/isos/CentOS*Minimal*.iso > ~/build/centos7_simple_kickstart/isos/.validate_iso.txt
+shasum -a 256 ${HOME}/build/centos7_simple_kickstart/isos/CentOS*Minimal*.iso > ${HOME}/build/centos7_simple_kickstart/isos/.validate_iso.txt
 NOTESUM=`egrep "CentOS.*Minimal.*\.iso" ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html | awk -F ">" {'print $3'} | awk {'print $1'}`
-LOCALSUM=`awk {'print $1'} ~/build/centos7_simple_kickstart/isos/.validate_iso.txt`
+LOCALSUM=`awk {'print $1'} ${HOME}/build/centos7_simple_kickstart/isos/.validate_iso.txt`
 printf "\n\nChecksum of ISO from centos.org: ${NOTESUM}\nChecksum of Local ISO: ${LOCALSUM}\n\n"
 fi
 #
@@ -119,43 +146,16 @@ fi
 
 
 
-######################################### Create vboxnet0 local interface
-# VBox is slow to instantiate the interfaces and will return a result code before it completes...
-for vboxnet in `seq 3`
-do
-VBOXNETEXISTS=`VBoxManage list -l hostonlyifs | grep -c vboxnet0`
-if [ ${VBOXNETEXISTS} -lt 1 ] ; then
-  printf "\n\nCreating HostOnlyIF\n"
-  VBoxManage hostonlyif create
-  sleep ${vboxnet}
-fi
-done
-#
-for net0ip in `seq 3`
-do
-VBOXNETCONFIGURED=`VBoxManage list -l hostonlyifs | grep -c "192\.168\.120\.1"`
-if [ ${VBOXNETCONFIGURED} -lt 1 ] ; then
-  printf "Setting vboxnet0 to 192.168.120.1 netmask 255.255.255.0\n\n"
-  VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.120.1 --netmask 255.255.255.0
-  sleep ${net0ip}
-fi
-done
-######################################### Create vboxnet0 local interface
-
-
-
-
-
 ######################################### Start local web server on vboxnet0
-mkdir -p ~/build/centos7_simple_kickstart/www/html
-mkdir -p ~/build/centos7_simple_kickstart/logs
-mkdir -p ~/build/centos7_simple_kickstart/tmp
-chmod 0755 ~/build/centos7_simple_kickstart/www/html
-chmod 0700 ~/build/centos7_simple_kickstart/tmp
-cp ~/build/centos7_simple_kickstart/scripts/c7*cfg ~/build/centos7_simple_kickstart/www/html/
-chmod 0644 ~/build/centos7_simple_kickstart/www/html/c7*cfg
+mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html
+mkdir -p ${HOME}/build/centos7_simple_kickstart/logs
+mkdir -p ${HOME}/build/centos7_simple_kickstart/tmp
+chmod 0755 ${HOME}/build/centos7_simple_kickstart/www/html
+chmod 0700 ${HOME}/build/centos7_simple_kickstart/tmp
+cp ${HOME}/build/centos7_simple_kickstart/scripts/c7*cfg ${HOME}/build/centos7_simple_kickstart/www/html/
+chmod 0644 ${HOME}/build/centos7_simple_kickstart/www/html/c7*cfg
 
-cat << zzzAPACHEzzz > ~/build/centos7_simple_kickstart/scripts/httpd.conf
+cat << zzzAPACHEzzz > ${HOME}/build/centos7_simple_kickstart/scripts/httpd.conf
 ServerTokens prod
 PidFile ${HOME}/build/centos7_simple_kickstart/tmp/httpd.pid
 ScoreBoardFile ${HOME}/build/centos7_simple_kickstart/tmp/.scoreboard
@@ -192,17 +192,19 @@ EnableSendfile off
 zzzAPACHEzzz
 
 
-/usr/sbin/httpd -T -f ~/build/centos7_simple_kickstart/scripts/httpd.conf -E ~/build/centos7_simple_kickstart/logs/apache_startup.log -k stop > /dev/null 2>&1
-/usr/sbin/httpd -T -f ~/build/centos7_simple_kickstart/scripts/httpd.conf -E ~/build/centos7_simple_kickstart/logs/apache_startup.log -k stop > /dev/null 2>&1
-rm -f ~/build/centos7_simple_kickstart/httpd.pid
+/usr/sbin/httpd -T -f ${HOME}/build/centos7_simple_kickstart/scripts/httpd.conf -E ${HOME}/build/centos7_simple_kickstart/logs/apache_startup.log -k stop > /dev/null 2>&1
+/usr/sbin/httpd -T -f ${HOME}/build/centos7_simple_kickstart/scripts/httpd.conf -E ${HOME}/build/centos7_simple_kickstart/logs/apache_startup.log -k stop > /dev/null 2>&1
+if [ -s ${HOME}/build/centos7_simple_kickstart/httpd.pid ] ; then
+kill -9 `cat ${HOME}/build/centos7_simple_kickstart/httpd.pid`
+rm -f ${HOME}/build/centos7_simple_kickstart/httpd.pid
+fi
 sync
-sleep 1
-for patchy in `seq 7`
+sleep 2
+for patchy in `seq 5`
 do
- APACHECOUNT=`netstat -an | grep -c 8888`
+ APACHECOUNT=`sleep 1;sync;netstat -an | grep -c 8888`
  if [ ${APACHECOUNT} -lt 1 ] ; then
- /usr/sbin/httpd -T -f ~/build/centos7_simple_kickstart/scripts/httpd.conf -E ~/build/centos7_simple_kickstart/logs/apache_startup.log -k start
- sync
+ /usr/sbin/httpd -T -f ${HOME}/build/centos7_simple_kickstart/scripts/httpd.conf -E ${HOME}/build/centos7_simple_kickstart/logs/apache_startup.log -k start
  sleep ${patchy}
  fi
 done
@@ -212,7 +214,7 @@ done
 
 
 ######################################### Start local rsync server on vboxnet0
-cat << zzzRSYNCzzz > ~/build/centos7_simple_kickstart/scripts/rsyncd.conf
+cat << zzzRSYNCzzz > ${HOME}/build/centos7_simple_kickstart/scripts/rsyncd.conf
 uid = ${USER}
 use chroot = no
 max connections = 127
@@ -235,12 +237,11 @@ read only = yes
 
 zzzRSYNCzzz
 
-for mysync in `seq 7`
+for mysync in `seq 5`
 do
-RSYNCRUNNING=`netstat -an | grep -c 10873`
+RSYNCRUNNING=`sleep 1;sync;netstat -an | grep -c 10873`
 if [ ${RSYNCRUNNING} -lt 1 ] ; then
 rm -f ${HOME}/build/centos7_simple_kickstart/tmp/rsync*
-sync
 rsync --daemon --ipv4 --address=192.168.120.1 --port=10873 --config=${HOME}/build/centos7_simple_kickstart/scripts/rsyncd.conf
 sleep ${mysync}
 fi
@@ -286,7 +287,6 @@ VBoxManage modifyvm ${VM0} --nic1 hostonly --hostonlyadapter1 vboxnet0 --nictype
 VBoxManage modifyvm ${VM0} --nicpromisc1 allow-all
 VBoxManage modifyvm ${VM0} --biospxedebug off
 VBoxManage modifyvm ${VM0} --nicbootprio1 1
-#VBoxManage modifyvm ${VM0} --boot1 dvd --boot2 disk --boot3 none --boot4 none
 VBoxManage modifyvm ${VM0} --boot1 disk --boot2 dvd --boot3 none --boot4 none
 #
 ######################################### Create kickstart server VM
