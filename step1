@@ -89,6 +89,7 @@ VBOXNETCONFIGURED=`VBoxManage list -l hostonlyifs | grep -c "192\.168\.120\.1"`
 if [ ${VBOXNETCONFIGURED} -lt 1 ] ; then
   printf "Setting vboxnet0 to 192.168.120.1 netmask 255.255.255.0\n\n"
   VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.120.1 --netmask 255.255.255.0
+  VBoxManage dhcpserver remove --netname HostInterfaceNetworking-vboxnet0
   sleep ${net0ip}
 fi
 done
