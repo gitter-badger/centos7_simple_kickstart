@@ -55,17 +55,14 @@ export PATH USER MYNAME YOURNUMBER
 
 
 
-######################################### Create vboxnet0 local interface
-VBOXNETEXISTS=`VBoxManage list -l hostonlyifs | grep -c vboxnet0`
-if [ ${VBOXNETEXISTS} -lt 1 ] ; then
-  printf "\n\nCreating HostOnlyIF\n"
-  VBoxManage hostonlyif create
-  sleep 2
-  printf "Setting vboxnet0 to 192.168.120.1 netmask 255.255.255.0\n\n"
-  VBoxManage hostonlyif ipconfig vboxnet0 --ip 192.168.120.1 --netmask 255.255.255.0
-  sleep 2
+######################################### GET vboxnet local interface
+if [ -s ${HOME}/build/centos7_simple_kickstart/etc/hostonlyif.conf ] ; then
+OURHOSTONLYIF=`head -n1 ${HOME}/build/centos7_simple_kickstart/etc/hostonlyif.conf`
+else
+printf "\n\nUnable to determine vboxnet interface we expect to see in ${HOME}/build/centos7_simple_kickstart/etc/hostonlyif.conf\n\n"
+exit 2
 fi
-######################################### Create vboxnet0 local interface
+######################################### GET vboxnet local interface
 
 
 NUMBER_VALIDATE=`echo "${YOURNUMBER}" | egrep -c "^[0-9]{1,2}$"`
@@ -86,17 +83,10 @@ do
 
 ######################################### Create small VM
 # VM1, small VMs
-printf "\n\nCreating ${MYNAME}${MYNUMBER} in base folder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}\n\n"
-VBoxManage createvm --name ${MYNAME}${MYNUMBER} --ostype RedHat_64 --basefolder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER} --register
-if [ ! -d ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER} ] ; then
-mkdir -p ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}
-fi
 if [ ! -f ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi ] ; then
-VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi" --size 4096 --variant Fixed
-fi
-VBoxManage storagectl ${MYNAME}${MYNUMBER} --name mysata --add sata --controller IntelAHCI --portcount 2 --hostiocache off
-VBoxManage storageattach ${MYNAME}${MYNUMBER} --storagectl mysata --port 0 --medium ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi --type hdd
-
+printf "\n\nCreating ${MYNAME}${MYNUMBER} in base folder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}\n\n"
+mkdir -p ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}
+VBoxManage createvm --name ${MYNAME}${MYNUMBER} --ostype RedHat_64 --basefolder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER} --register
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --vrde off
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --usb off
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --clipboard disabled
@@ -104,13 +94,20 @@ VBoxManage modifyvm ${MYNAME}${MYNUMBER} --clipboard disabled
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --memory 1200 --vram 12 --cpus 1 --cpuexecutioncap 80
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --firmware bios
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --audio none --chipset ich9
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nic1 hostonly --hostonlyadapter1 vboxnet0 --nictype1 82545EM --macaddress1 auto
+VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nic1 hostonly --hostonlyadapter1 ${OURHOSTONLYIF} --nictype1 82545EM --macaddress1 auto
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nicpromisc1 allow-all
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nicbootprio1 1
 VBoxManage modifyvm ${MYNAME}${MYNUMBER} --boot1 disk --boot2 net --boot3 none --boot4 none
+VBoxManage storagectl ${MYNAME}${MYNUMBER} --name mysata --add sata --controller IntelAHCI --portcount 2 --hostiocache off
+VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi" --size 4096 --variant Fixed
+VBoxManage storageattach ${MYNAME}${MYNUMBER} --storagectl mysata --port 0 --medium ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi --type hdd
+fi
+
 ######################################### Create small VM
 
+printf "\n"
 VBoxManage startvm ${MYNAME}${MYNUMBER} &
+printf "\n"
 
 done
 
