@@ -39,8 +39,8 @@
 <code>mkdir -p ~/build/centos7_simple_kickstart/scripts && cd ~/build/centos7_simple_kickstart/scripts && git pull https://github.com/ohdns/centos7_simple_kickstart.git</code><br /></li>
 
 <li><u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
- ... or don't.  The default password for zod and root will be <b>centos7</b><br />
-<b>zod</b> will be the Ansible automation account; and temporarily, the way you ssh to your VM.<br />
+ ... or don't.  The default password for ohadmin and root will be <b>centos7</b><br />
+<b>ohadmin</b> will be the Ansible automation account; and temporarily, the way you ssh to your VM.<br />
 You <b>must</b> also replace the SSH Public Key in the c7 .cfg files with your public key.<br />
 Please <b>do not</b> use this hash anywhere that contains sensitive data or build automation.</li>
 
@@ -94,7 +94,7 @@ All services need to be initialized by a proper startup script when the server O
 
 <li>This method currently lacks end-to-end validation of the RPM GPG signatures.  (Work In Progress)</li>
 
-<li>You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Ansible user (zod).</li>
+<li>You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Ansible user (ohadmin).</li>
 
 <li>There is currently a bit of customization in the kickstart files.  This will be moved into Ansible as this document and repo evolve to include managing these hosts with Ansible.</li>
 
