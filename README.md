@@ -24,7 +24,7 @@
 
 <li>Access to the internet on TCP ports 80 (http), 443 (https) and 873 (rsync)</li>
 
-<li>About 120 GB of free space on your hard drive.</li>
+<li>About 100 GB of free space on your hard drive. <i>Actual usage may be much less</i></li>
 
 <li>Some type of command line interface.  Most folks use <b>Terminal</b> on Mac.</li>
 </ul>
@@ -96,9 +96,9 @@ All services need to be initialized by a proper startup script when the server O
 
 <li>You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Ansible user (ohadmin).</li>
 
-<li>There is currently a bit of customization in the kickstart files.  This will be moved into Ansible as this document and repo evolve to include managing these hosts with Ansible.</li>
+<li>There is currently a bit of customization in the kickstart files.  Much of this will be moved into Ansible as this document and repo evolve to include managing these hosts with Ansible.</li>
 
-<li>We currently lack the Ansible VM role and Ansible configuration.  That is our next step in this excersize.</li>
+<li>We currently lack the Ansible VM role and Ansible configuration.  That is our next step in this excersize at some point.</li>
 
 <li>Since we are not using Vagrant, you would have to script startup/shutdown yourself.<br /><br />
 <code>PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS;export PATH</code><br /><br />
