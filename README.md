@@ -100,7 +100,10 @@ All services need to be initialized by a proper startup script when the server O
 
 <li>We currently lack the Ansible VM role and Ansible configuration.  That is our next step in this excersize at some point.</li>
 
+<li>I renice this script to avoid blocking any work you are doing. This means if your laptop is under a heavy load, this kickstart build process may go very slow by design.</li>
+
 <li>Since we are not using Vagrant, you would have to script startup/shutdown yourself.<br /><br />
+<b>Examples:</b><br /><br />
 <code>PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS;export PATH</code><br /><br />
 Clean / Graceful Power Off:<br />
 <code>VBoxManage controlvm c7_small_1 acpipowerbutton</code><br /><br />
@@ -111,4 +114,5 @@ Power On Headless (No GUI / console):<br />
 </li>
 </ul>
 </p>
-<p><b><br />Disclaimer: This repo contains scripts that are for educational purposes only.  This repo contains default passwords and ssh public keys that must not be used anywhere beyond VirtualBox on your laptop for educational purposes only. DO NOT use this to deploy a production environment unless you have properly changed all defaults, changed settings to reflect that which is approved for your environment and have properly tested this in a lab and staging area that matches your live environments.  The author of these scripts assumes no responsibility for damages to persons or property.<br /><br /></b></p>
+<p><b><br />Disclaimer: This repo contains scripts that are for educational purposes only.  This repo contains default passwords and ssh public keys that must not be used anywhere beyond VirtualBox on your laptop for educational purposes only. DO NOT use this to deploy a production environment unless you have properly changed all defaults, changed settings to reflect that which is approved for your environment and have properly tested this in a lab and staging area that matches your live environments.  The author of these scripts assumes no responsibility for damages to persons or property.<br /><br /></b><br /></p>
+<i>20151111</i>
