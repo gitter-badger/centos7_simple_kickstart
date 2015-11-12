@@ -55,16 +55,44 @@ export PATH USER MYNAME YOURNUMBER
 
 
 
-######################################### GET vboxnet local interface
-if [ -s ${HOME}/build/centos7_simple_kickstart/etc/hostonlyif.conf ] ; then
-OURHOSTONLYIF=`head -n1 ${HOME}/build/centos7_simple_kickstart/etc/hostonlyif.conf`
-else
-printf "\n\nUnable to determine vboxnet interface we expect to see in ${HOME}/build/centos7_simple_kickstart/etc/hostonlyif.conf\n\n"
-exit 2
-fi
-######################################### GET vboxnet local interface
+######################################### Create vboxnet local interface
+# VBox is slow to instantiate the interfaces and will return a result code before it completes...
+VBOX_EXISTING_INTERFACE=`VBoxManage list -l hostonlyifs | grep -B3 "192\.168\.120\.1" | grep vboxnet | awk {'print $NF'}`
+VBOX_EXISTING_COUNT=`VBoxManage list -l hostonlyifs | grep -B3 "192\.168\.120\.1" | grep -c vboxnet`
+VBOX_NET_IS_UP=`ifconfig -a | grep -c "192\.168\.120\.1"`
+#
+ if [ ${VBOX_EXISTING_COUNT} -lt 1 ] ; then
+  printf "\n\nCreating HostOnlyIF\n"
+  OURHOSTONLYIF=`VBoxManage hostonlyif create 2>/dev/null | grep ^Interface | awk -F "\'" {'print $2'}`
+  printf "Setting ${OURHOSTONLYIF} to 192.168.120.1 netmask 255.255.255.0\n\n"
+  VBoxManage hostonlyif ipconfig ${OURHOSTONLYIF} --ip 192.168.120.1 --netmask 255.255.255.0
+  VBoxManage dhcpserver remove --netname HostInterfaceNetworking-${OURHOSTONLYIF} 2>/dev/null
+  export OURHOSTONLYIF
+  sleep 2
+
+ elif [ ${VBOX_EXISTING_COUNT} -gt 0 ] && [ ${VBOX_NET_IS_UP} -lt 1 ] ; then
+  VBoxManage hostonlyif ipconfig ${VBOX_EXISTING_INTERFACE} --ip 192.168.120.1 --netmask 255.255.255.0
+  VBoxManage dhcpserver remove --netname HostInterfaceNetworking-${VBOX_EXISTING_INTERFACE} 2>/dev/null
+  OURHOSTONLYIF=`printf "${VBOX_EXISTING_INTERFACE}"`
+  export OURHOSTONLYIF
+  sleep 2
+
+ elif  [ ${VBOX_EXISTING_COUNT} -gt 0 ] && [ ${VBOX_NET_IS_UP} -gt 0 ] ; then
+  printf "\n\nLooks like we have an existing vboxnet interface of ${VBOX_EXISTING_INTERFACE}.\n\n"
+  OURHOSTONLYIF=`printf "${VBOX_EXISTING_INTERFACE}"`
+  export OURHOSTONLYIF
+  sleep 2
+
+ else
+  printf "\n\nUnable to determine a way to bring up our vboxnet internface.\n\n"
+  exit 2
+ fi
+#
+sync
+######################################### Create vboxnet local interface
 
 
+######################################### Validate Input
 NUMBER_VALIDATE=`echo "${YOURNUMBER}" | egrep -c "^[0-9]{1,2}$"`
 if [ ${NUMBER_VALIDATE} -lt 1 ] || [ ${NUMBER_VALIDATE} -gt 1 ] ; then
 printf "\n\nI see ${NUMBER_VALIDATE} valid numbers in ${YOURNUMBER}\n\nPlease select a positive integer between 1 and 64.\n\n"
@@ -75,14 +103,15 @@ if [ ${YOURNUMBER} -gt 64 ] ; then
 printf "\n\nYou are asking to create more than 64 VM's.  Something is probably wrong.  Refusing to run.\n\n"
 exit 2
 fi
+######################################### Validate Input
 
 
+######################################### Create small VM
+# VM1, small VMs
 # Lets background these and just hope we dont nuke your poor CPU and disk.
 for MYNUMBER in `seq -w ${YOURNUMBER}`
 do
 
-######################################### Create small VM
-# VM1, small VMs
 if [ ! -f ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi ] ; then
 printf "\n\nCreating ${MYNAME}${MYNUMBER} in base folder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}\n\n"
 mkdir -p ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}

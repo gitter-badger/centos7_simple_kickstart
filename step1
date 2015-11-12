@@ -73,7 +73,7 @@ export PATH USER VM0
 
 #########################################  Local PXE in VirtualBox to bootstrap the first KS VM automagically
 #mkdir -p ${HOME}/.VirtualBox/TFTP/pxelinux.cfg ${HOME}/.VirtualBox/TFTP/netboot
-#cp ~/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64/isolinux/* ${HOME}/.VirtualBox/TFTP/
+#cp ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64/isolinux/* ${HOME}/.VirtualBox/TFTP/
 #
 # yuck, this is actually harder than just typing one line.  what a mess.
 #########################################  Local PXE in VirtualBox to bootstrap the first KS VM automagically
@@ -89,30 +89,41 @@ export PATH USER VM0
 
 
 
-######################################### Create ${OURHOSTONLYIF} vboxnet local interface
+######################################### Create vboxnet local interface
 # VBox is slow to instantiate the interfaces and will return a result code before it completes...
-for vboxnet in `seq 7`
-do
-VBOXNETEXISTS=`VBoxManage list -l hostonlyifs | grep -c "192\.168\.120\.1"`
-if [ ${VBOXNETEXISTS} -lt 1 ] ; then
+VBOX_EXISTING_INTERFACE=`VBoxManage list -l hostonlyifs | grep -B3 "192\.168\.120\.1" | grep vboxnet | awk {'print $NF'}`
+VBOX_EXISTING_COUNT=`VBoxManage list -l hostonlyifs | grep -B3 "192\.168\.120\.1" | grep -c vboxnet`
+VBOX_NET_IS_UP=`ifconfig -a | grep -c "192\.168\.120\.1"`
+#
+ if [ ${VBOX_EXISTING_COUNT} -lt 1 ] ; then
   printf "\n\nCreating HostOnlyIF\n"
   OURHOSTONLYIF=`VBoxManage hostonlyif create 2>/dev/null | grep ^Interface | awk -F "\'" {'print $2'}`
   printf "Setting ${OURHOSTONLYIF} to 192.168.120.1 netmask 255.255.255.0\n\n"
   VBoxManage hostonlyif ipconfig ${OURHOSTONLYIF} --ip 192.168.120.1 --netmask 255.255.255.0
-  VBoxManage dhcpserver remove --netname HostInterfaceNetworking-${OURHOSTONLYIF}
+  VBoxManage dhcpserver remove --netname HostInterfaceNetworking-${OURHOSTONLYIF} 2>/dev/null
   export OURHOSTONLYIF
-  sleep ${vboxnet}
-else
-  OURHOSTONLYIF=`ifconfig|grep -B2 192\.168\.120|grep ^vbox | awk -F ":" {'print $1'}`
+  sleep 2
+
+ elif [ ${VBOX_EXISTING_COUNT} -gt 0 ] && [ ${VBOX_NET_IS_UP} -lt 1 ] ; then
+  VBoxManage hostonlyif ipconfig ${VBOX_EXISTING_INTERFACE} --ip 192.168.120.1 --netmask 255.255.255.0
+  VBoxManage dhcpserver remove --netname HostInterfaceNetworking-${VBOX_EXISTING_INTERFACE} 2>/dev/null
+  OURHOSTONLYIF=`printf "${VBOX_EXISTING_INTERFACE}"`
   export OURHOSTONLYIF
-fi
-done
+  sleep 2
+
+ elif  [ ${VBOX_EXISTING_COUNT} -gt 0 ] && [ ${VBOX_NET_IS_UP} -gt 0 ] ; then
+  printf "\n\nLooks like we have an existing vboxnet interface of ${VBOX_EXISTING_INTERFACE}.\n\n"
+  OURHOSTONLYIF=`printf "${VBOX_EXISTING_INTERFACE}"`
+  export OURHOSTONLYIF
+  sleep 2
+
+ else
+  printf "\n\nUnable to determine a way to bring up our vboxnet internface.\n\n"
+  exit 2
+ fi
 #
-mkdir -p ${HOME}/build/centos7_simple_kickstart/etc
-chmod 750 ${HOME}/build/centos7_simple_kickstart/etc
-printf "${OURHOSTONLYIF}\n" > ${HOME}/build/centos7_simple_kickstart/etc/hostonlyif.conf
-#
-######################################### Create ${OURHOSTONLYIF} vboxnet local interface
+sync
+######################################### Create vboxnet local interface
 
 
 
