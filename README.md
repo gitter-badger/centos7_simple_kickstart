@@ -36,11 +36,11 @@
 <li>Install VirtualBox if you have not done so already.  See virtualbox.org</li>
 
 <li>Clone this repo.  See https://github.com/ for instructions on how to clone repos.<br />
-<code>mkdir -p ~/build/centos7_simple_kickstart/scripts && cd ~/build/centos7_simple_kickstart/scripts && git pull https://github.com/ohdns/centos7_simple_kickstart.git</code><br /></li>
+<code>mkdir -p ~/build/centos7_simple_kickstart/scripts && cd ~/build/centos7_simple_kickstart/scripts && git clone https://github.com/ohdns/centos7_simple_kickstart.git</code><br /></li>
 
 <li><u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
  ... or don't.  The default password for ohadmin and root will be <b>centos7</b><br />
-<b>ohadmin</b> will be the Ansible automation account; and temporarily, the way you ssh to your VM.<br />
+<b>ohadmin</b> will be the Ansible automation account; and <i>temporarily</i>, the way you ssh to your VM.<br />
 You <b>must</b> also replace the SSH Public Key in the c7 .cfg files with your public key.<br />
 Please <b>do not</b> use this hash anywhere that contains sensitive data or build automation.</li>
 
@@ -115,4 +115,4 @@ Power On Headless (No GUI / console):<br />
 </ul>
 </p>
 <p><b><br />Disclaimer: This repo contains scripts that are for educational purposes only.  This repo contains default passwords and ssh public keys that must not be used anywhere beyond VirtualBox on your laptop for educational purposes only. DO NOT use this to deploy a production environment unless you have properly changed all defaults, changed settings to reflect that which is approved for your environment and have properly tested this in a lab and staging area that matches your live environments.  The author of these scripts assumes no responsibility for damages to persons or property.<br /><br /></b><br /></p>
-<i>20151111</i>
+<i>20151112</i>
