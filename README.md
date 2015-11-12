@@ -63,9 +63,10 @@ This will build the first VM (the kickstart server role) and will rsync the Yum 
 <p>
 <ul>
 <li>Keep SELinux enabled, no matter what you plan to install.<br />
-Instead of disabling SELinux, read up on setting booleans, creating rules, setting file and directory contexts (semanage fcontext)<br />
+Instead of disabling SELinux, read up on setting booleans (<i>setsebool -P boolean or getsebool -a</i>), creating rules, setting file and directory contexts (semanage fcontext)<br />
 Confine as many applications as you can, to the least amount of privilages required to run the application.<br />
-Use audit2allow, audit2why or grep through /var/log/audit/audit.log to see why something was denied.</li>
+Use audit2allow, audit2why or grep through /var/log/audit/audit.log to see why something was denied.<br />
+<b>As a last resort</b>, set a user or process to <i>unconfined_</i> instead of disabling SELinux.</li>
 
 <li>Prefer a chroot restricted SFTP over unrestricted SSH trusts when feasible.</li>
 
