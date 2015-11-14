@@ -137,11 +137,16 @@ if [ ! -d ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/update
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/{os,updates,extras}
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/epel/7/x86_64
 mkdir -p ${HOME}/build/centos7_simple_kickstart/scripts ${HOME}/build/centos7_simple_kickstart/isos
+#
+# CENTOS
 rsync -auvH --progress --delay-updates --delete --delete-after mirrors.kernel.org::centos/7/isos/CentOS*Minimal*.iso ~/build/centos7_simple_kickstart/isos/.
 rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ --exclude=drpms/ mirrors.kernel.org::centos/7/os/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64/.
 rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ --exclude=drpms/ mirrors.kernel.org::centos/7/updates/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/updates/x86_64/.
 rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ --exclude=drpms/ mirrors.kernel.org::centos/7/extras/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/extras/x86_64/.
+##  EPEL
+##  Comment out the next line if you do NOT want a copy of the EPEL repo.  It is about 8GB.
 rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ --exclude=drpms/ mirrors.cat.pdx.edu::fedora-epel/7/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/epel/7/x86_64/.
+#
 date >> ${HOME}/build/centos7_simple_kickstart/www/html/mirror/localsync.log 
 #
 curl -A Mozilla -s https://wiki.centos.org/Manuals/ReleaseNotes/CentOS7 -o ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html
