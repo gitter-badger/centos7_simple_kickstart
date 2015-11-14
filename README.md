@@ -44,6 +44,8 @@
 You <b>must</b> also replace the SSH Public Key in the c7 .cfg files with your public key.<br />
 Please <b>do not</b> use this hash anywhere that contains sensitive data or build automation.</li>
 
+<li>Create ~/build/centos7_simple_kickstart/www/html/mirror/docker_images and put your docker images in it.<br />This will get mirrored by the first VM you create in step1, which happens to be your yum/kickstart server.</li>
+
 <li><u>Execute</u> <code>~/build/centos7_simple_kickstart/scripts/step1</code> to <br />
 Sync the public CentOS and EPEL repo to your laptop<br />
 Start up a local apache instance on 192.168.120.1 on a new private network of 192.168.120.0/24<br />
@@ -54,7 +56,7 @@ At this point, hit the TAB key, backspace over <i>quiet</i> and type:<br /><br /
 <code>cmdline nicdelay=10 ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg</code><br /><br />
 This will build the first VM (the kickstart server role) and will rsync the Yum repos to itself, pulling from your laptop. Get a cup of coffee or tea while this runs.</li>
 
-<li>When the first VM completes building:<br /><br /><u>Execute</u> <code>~/build/centos7_simple_kickstart/scripts/step2 {n}</code> to spin up <i>n</i> number of VM's.<br /><br />Unless you change the step scripts, the VM's will use up to 1.5 GB of ram each. Most laptops do not have more than 16 GB of ram. By all means, fiddle with the memory allocation to see what you can create.</li>
+<li>When the first VM completes building:<br /><br /><u>Execute</u> <code>~/build/centos7_simple_kickstart/scripts/step2 {n}</code> to spin up <i>n</i> number of VM's.<br /><br />Unless you change the step scripts, the VM's will use up to 1.2 GB of ram each. Most laptops do not have more than 16 GB of ram. By all means, fiddle with the memory allocation to see what you can create.</li>
 </ul>
 </p>
 
