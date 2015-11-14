@@ -137,6 +137,8 @@ if [ ! -d ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/update
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/{os,updates,extras}
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/epel/7/x86_64
 mkdir -p ${HOME}/build/centos7_simple_kickstart/scripts ${HOME}/build/centos7_simple_kickstart/isos
+mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/docker_images
+chmod 755 ${HOME}/build/centos7_simple_kickstart/www/html/mirror/docker_images
 #
 # CENTOS
 rsync -auvH --progress --delay-updates --delete --delete-after mirrors.kernel.org::centos/7/isos/CentOS*Minimal*.iso ~/build/centos7_simple_kickstart/isos/.
