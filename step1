@@ -344,7 +344,7 @@ fi
 
 VBoxManage startvm ${VM0}
 
-printf "\n\nWhen the ISO boots, hit the TAB key, backspace over \"quiet\" and type:\n\tnicdelay=10 cmdline ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg\n\n"
+printf "\n\nWhen the ISO boots, hit the TAB key, backspace over \"quiet\" and type:\n\tcmdline ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg\n\n"
 
 printf "\nReminder: the post install section will take a while as it is copying data from your mac yum repos.\n"
 
