@@ -40,7 +40,7 @@
 
 <li><u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
  ... or don't.  The default password for ohadmin and root will be <b>centos7</b><br />
-<b>ohadmin</b> will be the Ansible automation account; and <i>temporarily</i>, the way you ssh to your VM.<br />
+<b>ohadmin</b> will be the automation account; and <i>temporarily</i>, the way you ssh to your VM.<br />
 You <b>must</b> also replace the SSH Public Key in the c7 .cfg files with your public key.<br />
 Please <b>do not</b> use this hash anywhere that contains sensitive data or build automation.</li>
 
@@ -78,7 +78,7 @@ where the application logs should reside. <i>i.e. /data/application_name/logs</i
 where transitory data should reside. <i>i.e. /data/application_name/data</i><br />
 or better, <b>use docker!</b> to keep the OS pristine and easy to patch.<br />
 and what permissions are required for the application to run and for <b>the right folks</b> to view logs without sudo.</li>
-<li>Aside from the Ansible account, avoid SSH key trusts when you can. Proper automation is derrived from codified instructions that occur in the data-center, not from a laptop.</li>
+<li>Aside from the Automation account, avoid SSH key trusts when you can. Proper automation is derrived from codified instructions that occur in the data-center, not from a laptop.</li>
 
 <li>Avoid enabling root login via ssh.  In fact, avoid logging into any VM's if you can.<br />
 The base configuration belongs in kickstart and customization needs to be done in a configuration management and orchestration system.<br />
@@ -98,13 +98,14 @@ All services need to be initialized by a proper startup script when the server O
 
 <li>This method currently lacks end-to-end validation of the RPM GPG signatures.  (Work In Progress)</li>
 
-<li>You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Ansible user (ohadmin).</li>
+<li>You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Automation user (ohadmin).</li>
 
-<li>There is currently a bit of customization in the kickstart files.  Much of this will be moved into Ansible as this document and repo evolve to include managing these hosts with Ansible.</li>
+<li>There is currently a bit of customization in the kickstart files.  Much of this will be moved into automation as this document and repo evolve to include managing these hosts with automation and orchestration services.</li>
 
 <li>I renice this script to avoid blocking any work you are doing. This means if your laptop is under a heavy load, this kickstart build process may go very slow by design.</li>
 
 <li>Since we are not using Vagrant, you would have to script startup/shutdown yourself.<br /><br />
+
 <b>Examples:</b><br /><br />
 <code>PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS;export PATH</code><br /><br />
 Clean / Graceful Power Off:<br />
