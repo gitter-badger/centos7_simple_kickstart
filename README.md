@@ -73,8 +73,9 @@ Use audit2allow, audit2why or grep through /var/log/audit/audit.log to see why s
 <li>Prefer a chroot restricted SFTP over unrestricted SSH trusts when feasible.</li>
 
 <li>For custom applications, clearly define:<br />
-where the application should be installed. <i>i.e. /opt/application_name/{etc,bin,sbin,var}</i><br />
+where the application binaries should be installed. <i>i.e. /opt/application_name/{etc,bin,sbin,var}</i><br />
 where the application logs should reside. <i>i.e. /data/application_name/logs</i><br />
+where transitory data should reside. <i>i.e. /data/application_name/data</i><br />
 or better, <b>use docker!</b> to keep the OS pristine and easy to patch.<br />
 and what permissions are required for the application to run and for <b>the right folks</b> to view logs without sudo.</li>
 <li>Aside from the Ansible account, avoid SSH key trusts when you can. Proper automation is derrived from codified instructions that occur in the data-center, not from a laptop.</li>
