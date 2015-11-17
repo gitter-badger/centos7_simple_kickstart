@@ -38,7 +38,6 @@ ___
 <li>Install VirtualBox if you have not done so already.  See virtualbox.org</li>
 
 <li>Clone this repo.  See https://github.com/ for instructions on how to clone repos.</li>
-<br />
 <code>
 mkdir -p ~/build/centos7_simple_kickstart/scripts
 </code>
@@ -50,10 +49,11 @@ git clone https://github.com/ohdns/centos7_simple_kickstart.git
 <code>
 mv centos7_simple_kickstart/* ~/build/centos7_simple_kickstart/scripts/
 </code>
-<br />
+<br /><br />
 
-<li><u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
- ... or don't.  The default password for ohadmin and root will be <b>centos7</b><br />
+<li><i>OPTIONAL</i>
+<u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
+The <b>default password</b> for <b>ohadmin</b> and <b>root</b> will be <b>centos7</b><br />
 <b>ohadmin</b> will be the automation account; and <i>temporarily</i>, the way you ssh to your VM.<br />
 You <b>must</b> also replace the SSH Public Key in the c7 .cfg files with your public key.<br />
 Please <b>do not</b> use this hash anywhere that contains sensitive data or build automation.</li>
@@ -104,23 +104,23 @@ All services need to be initialized by a proper startup script when the server O
 ___
 
 
-# Known Issues and Limitations:
+# Known Issues and Limitations / TO-DO's:
 <p>
 <ul>
-<li>To use NTP from the kickstart server to our laptop, we have to break our own rule one time and use either root or sudo to modify /private/etc/ntp-restrict.conf on our laptop to allow a query.<br />
+<li>LIMITATION and OPTIONAL: To use NTP from the kickstart server to our laptop, we have to break our own rule one time and use either root or sudo to modify /private/etc/ntp-restrict.conf on our laptop to allow a query.<br />
 <code>sudo echo "restrict 192.168.120.0/24" >> /private/etc/ntp-restrict.conf ; sudo pkill -HUP ntpd</code><br /></li>
 
-<li>There is one manual step to create the DHCP/PXE/Yum/Kickstart server.  This is <i>probably</i> ok, since we should not be doing this often.</li>
+<li>SUB-OPTIMAL: There is one manual step to create the DHCP/PXE/Yum/Kickstart server.  This is <i>probably</i> ok, since we should not be doing this often.</li>
 
-<li>This method currently lacks end-to-end validation of the RPM GPG signatures.  (Work In Progress)</li>
+<li>SUB-OPTIMAL: This method currently lacks end-to-end validation of the RPM GPG signatures.  (Work In Progress)</li>
 
-<li>You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Automation user (ohadmin).</li>
+<li>TO-DO: You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Automation user (ohadmin). I will eventually look for a file, or ask your permission to incorporate your existing public SSH key.  This comes with some risk.</li>
 
-<li>There is currently a bit of customization in the kickstart files.  Much of this will be moved into automation as this document and repo evolve to include managing these hosts with automation and orchestration services.</li>
+<li>TO-DO: There is currently a bit of customization in the kickstart files.  Much of this will be moved into automation as this document and repo evolve to include managing these hosts with automation and orchestration services.</li>
 
-<li>I renice this script to avoid blocking any work you are doing. This means if your laptop is under a heavy load, this kickstart build process may go very slow by design.</li>
+<li>WORKS AS DESIGNED: I renice this script to avoid blocking any work you are doing. This means if your laptop is under a heavy load, this kickstart build process may go very slow by design.</li>
 
-<li>Since we are not using Vagrant, you would have to script startup/shutdown yourself.<br /><br />
+<li>WORKS AS DESIGNED: Since we are not using Vagrant, you would have to script startup/shutdown yourself.<br /><br />
 
 <b>Examples:</b><br /><br />
 <code>PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS;export PATH</code><br /><br />
