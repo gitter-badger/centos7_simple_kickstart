@@ -16,6 +16,7 @@
 <li>Learn how kickstart works and what is required to build a simple CentOS 7 machine.</li>
 </ul>
 </p>
+___
 
 # Requirements:
 <p>
@@ -29,9 +30,9 @@
 <li>Some type of command line interface.  Most folks use <b>Terminal</b> on Mac.</li>
 </ul>
 </p>
+___
 
 # Steps
-___
 <p>
 <ul>
 <li>Install VirtualBox if you have not done so already.  See virtualbox.org</li>
@@ -88,6 +89,7 @@ All services need to be initialized by a proper startup script when the server O
 
 </ul>
 </p>
+___
 
 
 # Known Issues and Limitations:
@@ -119,5 +121,7 @@ Power On Headless (No GUI / console):<br />
 </li>
 </ul>
 </p>
+___
 <p><b><br />Disclaimer: This repo contains scripts that are for educational purposes only.  This repo contains default passwords and ssh public keys that must not be used anywhere beyond VirtualBox on your laptop for educational purposes only. DO NOT use this to deploy a production environment unless you have properly changed all defaults, changed settings to reflect that which is approved for your environment and have properly tested this in a lab and staging area that matches your live environments.  The author of these scripts assumes no responsibility for damages to persons or property.<br /><br /></b><br /></p>
-<i>20151114</i>
+___
+<i>20151117</i>
