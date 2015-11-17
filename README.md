@@ -73,7 +73,8 @@ Kickstart your <i>new kickstart VM server</i><br /><br />
 <code>cmdline ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg</code><br /><br />
 This will build the first VM (the kickstart server role) and will rsync the Yum repos to itself, pulling from your laptop. Get a cup of coffee or tea while this runs.</li>
 
-<li>When the first VM completes building:<br /><br /><u>Execute</u> <code>~/build/centos7_simple_kickstart/scripts/step2 {n}</code> to spin up <i>n</i> number of VM's.<br /><br />Unless you change the step scripts, the VM's will use up to 1.2 GB of ram each. Most laptops do not have more than 16 GB of ram. By all means, fiddle with the memory allocation to see what you can create.</li>
+<li>When the first VM completes building:<br /><br />
+ <b>Execute</b> <code>~/build/centos7_simple_kickstart/scripts/step2 {n}</code> to spin up <i>n</i> number of VM's.<br /><br />Unless you change the step scripts, the VM's will use up to 1.2 GB of ram each. Most laptops do not have more than 16 GB of ram. By all means, fiddle with the memory allocation to see what you can create. CentOS 7 can run in a small amount of memory and with a tiny disk, but it wants some disk space to stage temporary files.</li>
 </ul>
 </p>
 ___
