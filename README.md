@@ -35,9 +35,9 @@ ___
 # Steps
 <p>
 <ul>
-<li>Install VirtualBox if you have not done so already.  See virtualbox.org</li>
+<li><b><font color="#960000">Install</b></font> VirtualBox if you have not done so already.  See virtualbox.org</li>
 
-<li>Clone this repo.  See https://github.com/ for instructions on how to clone repos.</li>
+<li><b>Clone</b> this repo.  See https://github.com/ for instructions on how to clone repos.</li>
 <code>
 mkdir -p ~/build/centos7_simple_kickstart/scripts
 </code>
@@ -51,22 +51,25 @@ mv centos7_simple_kickstart/* ~/build/centos7_simple_kickstart/scripts/
 </code>
 <br /><br />
 
-<li><i>OPTIONAL</i>
-<u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
+<li><i>OPTIONAL:</i>
+ Edit the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
 The <b>default password</b> for <b>ohadmin</b> and <b>root</b> will be <b>centos7</b><br />
 The <i>ohadmin</i> account will be used for automation; and <i>temporarily</i>, the way you ssh to your VM for manual changes or docker deployments.<br />
-You <b>must</b> also replace the SSH Public Key in the c7 .cfg files with your public key.<br />
-Please <b>do not</b> use this hash anywhere that contains sensitive data or build automation.</li>
+You <i>should</i> replace the SSH Public Key in the misc c7.cfg files with your public key.<br />
 
-<li>Create ~/build/centos7_simple_kickstart/www/html/mirror/docker_images and put your docker images in it.<br />This will get mirrored by the first VM you create in step1, which happens to be your yum/kickstart server.</li>
+<li><i>OPTIONAL:</i>
+ Create ~/build/centos7_simple_kickstart/www/html/mirror/docker_images and put your docker images in it.<br />This will get mirrored by the first VM you create in step1, which happens to be your yum/kickstart server.</li>
 
-<li><u>Execute</u> <code>~/build/centos7_simple_kickstart/scripts/step1</code> to <br />
+<li>
+ <b>Execute</b> <code>~/build/centos7_simple_kickstart/scripts/step1</code>
+<br /><br />
+This step will perform the following:<br />
 Sync the public CentOS and EPEL repo to your laptop<br />
 Start up a local apache instance on 192.168.120.1 on a new private network of 192.168.120.0/24<br />
 Start up a local rsync daemon on a high port on 192.168.120.1<br />
 Kickstart your <i>new kickstart VM server</i><br /><br />
 <b>When the first VM starts</b>, you should see a CentOS ISO install screen.<br />
-At this point, hit the TAB key, backspace over <i>quiet</i> and type:<br /><br />
+<b>At this point</b>, hit the TAB key, backspace over <i>quiet</i> and type:<br /><br />
 <code>cmdline ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg</code><br /><br />
 This will build the first VM (the kickstart server role) and will rsync the Yum repos to itself, pulling from your laptop. Get a cup of coffee or tea while this runs.</li>
 
