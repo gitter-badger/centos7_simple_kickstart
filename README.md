@@ -53,7 +53,7 @@ mv centos7_simple_kickstart/* ~/build/centos7_simple_kickstart/scripts/
 
 <li><i>OPTIONAL:</i>
  Edit the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
-The <b>default password</b> for <b>ohadmin</b> and <b>root</b> will be <b>centos7</b><br />
+The <b>default password</b> for <b>ohadmin</b> and <b>root</b> will be `centos7`<br />
 The <i>ohadmin</i> account will be used for automation; and <i>temporarily</i>, the way you ssh to your VM for manual changes or docker deployments.<br />
 You <i>should</i> replace the SSH Public Key in the misc c7.cfg files with your public key.<br />
 
@@ -71,7 +71,7 @@ Kickstart your <i>new kickstart VM server</i><br /><br />
 <b>When the first VM starts</b>, you should see a CentOS ISO install screen.<br />
 <b>At this point</b>, hit the TAB key, backspace over <i>quiet</i> and type:<br /><br />
 <code>cmdline ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg</code><br /><br />
-This will build the first VM (the kickstart server role) and will rsync the Yum repos to itself, pulling from your laptop. Get a cup of coffee or tea while this runs.</li>
+This will build the first VM (the kickstart server role) and will rsync the Yum repos to itself, pulling from your laptop. Get a cup of coffee or tea while this runs.</li><br /><br />
 
 <li>When the first VM completes building:<br /><br />
  <b>Execute</b> <code>~/build/centos7_simple_kickstart/scripts/step2 {n}</code> to spin up <i>n</i> number of VM's.<br /><br />Unless you change the step scripts, the VM's will use up to 1.2 GB of ram each. Most laptops do not have more than 16 GB of ram. By all means, fiddle with the memory allocation to see what you can create. CentOS 7 can run in a small amount of memory and with a tiny disk, but it wants some disk space to stage temporary files.</li>
