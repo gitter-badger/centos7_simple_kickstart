@@ -38,7 +38,15 @@ ___
 <li>Install VirtualBox if you have not done so already.  See virtualbox.org</li>
 
 <li>Clone this repo.  See https://github.com/ for instructions on how to clone repos.<br />
-<code>mkdir -p ~/build/centos7_simple_kickstart/scripts && cd ~/build/centos7_simple_kickstart/scripts && git clone https://github.com/ohdns/centos7_simple_kickstart.git</code><br /></li>
+<code>
+mkdir -p ~/build/centos7_simple_kickstart/scripts
+<br />
+git clone https://github.com/ohdns/centos7_simple_kickstart.git
+<br />
+mv centos7_simple_kickstart/* ~/build/centos7_simple_kickstart/scripts/
+<br />
+</code>
+<br /></li>
 
 <li><u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
  ... or don't.  The default password for ohadmin and root will be <b>centos7</b><br />
