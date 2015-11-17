@@ -54,7 +54,7 @@ mv centos7_simple_kickstart/* ~/build/centos7_simple_kickstart/scripts/
 <li><i>OPTIONAL</i>
 <u>Edit</u> the .cfg files in ~/build/centos7_simple_kickstart/scripts and replace the SHA512 hashes with your own.<br />
 The <b>default password</b> for <b>ohadmin</b> and <b>root</b> will be <b>centos7</b><br />
-<b>ohadmin</b> will be the automation account; and <i>temporarily</i>, the way you ssh to your VM.<br />
+The <i>ohadmin</i> account will be used for automation; and <i>temporarily</i>, the way you ssh to your VM for manual changes or docker deployments.<br />
 You <b>must</b> also replace the SSH Public Key in the c7 .cfg files with your public key.<br />
 Please <b>do not</b> use this hash anywhere that contains sensitive data or build automation.</li>
 
