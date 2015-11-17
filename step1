@@ -311,8 +311,8 @@ VBoxManage createvm --name ${VM0} --ostype RedHat_64 --basefolder ${HOME}/build/
 VBoxManage modifyvm ${VM0} --vrde off
 VBoxManage modifyvm ${VM0} --usb off
 VBoxManage modifyvm ${VM0} --clipboard disabled
-#VBoxManage modifyvm ${VM0} --graphicscontroller none
-VBoxManage modifyvm ${VM0} --memory 1536 --vram 12 --cpus 1 --cpuexecutioncap 80
+#VBoxManage modifyvm ${VM0} --graphicscontroller none # must boot headless to use this
+VBoxManage modifyvm ${VM0} --memory 1200 --vram 12 --cpus 2 --cpuexecutioncap 90
 VBoxManage modifyvm ${VM0} --firmware bios
 VBoxManage modifyvm ${VM0} --audio none --chipset ich9
 VBoxManage modifyvm ${VM0} --nic1 hostonly --hostonlyadapter1 ${OURHOSTONLYIF} --nictype1 82545EM --macaddress1 auto
@@ -322,9 +322,9 @@ VBoxManage modifyvm ${VM0} --biospxedebug off
 VBoxManage modifyvm ${VM0} --nicbootprio1 1
 VBoxManage modifyvm ${VM0} --boot1 disk --boot2 dvd --boot3 none --boot4 none
 VBoxManage storagectl ${VM0} --name mysata --add sata --controller IntelAHCI --portcount 2 --hostiocache off
-VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_os.vdi" --size 4096 --variant Fixed
+VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_os.vdi" --size 3072 --variant Fixed
 VBoxManage storageattach ${VM0} --storagectl mysata --port 0 --medium ${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_os.vdi --type hdd
-VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_www.vdi" --size 40960 --variant Fixed
+VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_www.vdi" --size 30742 --variant Fixed
 VBoxManage storageattach ${VM0} --storagectl mysata --port 1 --medium ${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_www.vdi --type hdd
 fi
 #
