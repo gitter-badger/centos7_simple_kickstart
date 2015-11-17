@@ -24,13 +24,14 @@
 
 <li>Access to the internet on TCP ports 80 (http), 443 (https) and 873 (rsync)</li>
 
-<li>About 100 GB of free space on your hard drive. <i>Actual usage may be much less</i></li>
+<li>About 80 GB of free space on your hard drive. <i>Actual usage may be much less depending on number of VM you create.</i></li>
 
 <li>Some type of command line interface.  Most folks use <b>Terminal</b> on Mac.</li>
 </ul>
 </p>
 
 # Steps
+___
 <p>
 <ul>
 <li>Install VirtualBox if you have not done so already.  See virtualbox.org</li>
@@ -59,6 +60,7 @@ This will build the first VM (the kickstart server role) and will rsync the Yum 
 <li>When the first VM completes building:<br /><br /><u>Execute</u> <code>~/build/centos7_simple_kickstart/scripts/step2 {n}</code> to spin up <i>n</i> number of VM's.<br /><br />Unless you change the step scripts, the VM's will use up to 1.2 GB of ram each. Most laptops do not have more than 16 GB of ram. By all means, fiddle with the memory allocation to see what you can create.</li>
 </ul>
 </p>
+___
 
 # Some Challenges For You!
 
