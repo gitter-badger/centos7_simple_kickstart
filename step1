@@ -159,7 +159,6 @@ ${RS} mirrors.kernel.org::centos/7/extras/x86_64/. ${HOME}/build/centos7_simple_
 ##  Comment out the next line if you do NOT want a copy of the Fedora EPEL repo.  It is about 8GB.
 ${RS} mirrors.cat.pdx.edu::fedora-epel/7/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/epel/7/x86_64/.
 
-exit 0;
 #
 curl -A Mozilla -s https://wiki.centos.org/Manuals/ReleaseNotes/CentOS7 -o ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html
 shasum -a 256 ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS*netInstal*.iso > ${HOME}/build/centos7_simple_kickstart/isos/x86_64/.validate_iso.txt
