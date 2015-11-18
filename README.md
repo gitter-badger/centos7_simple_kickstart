@@ -59,7 +59,7 @@ The <i>ohadmin</i> account will be used for automation; and <i>temporarily</i>, 
 You <i>should</i> replace the SSH Public Key in the misc c7.cfg files with your public key.<br /><br />
 
 <li><i>OPTIONAL:</i>
- Create ~/build/centos7_simple_kickstart/www/html/mirror/docker_images and put your docker images in it.<br />This will get mirrored by the first VM you create in step1, which happens to be your yum/kickstart server.</li>
+ Create ~/build/centos7_simple_kickstart/www/html/mirror/docker_images and put your docker images in it.<br />This will get mirrored by the first VM you create in step1, which happens to be your yum/kickstart server.</li><br /><br />
 
 <li>
  <b>Execute</b> <code>~/build/centos7_simple_kickstart/scripts/step1</code>
