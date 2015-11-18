@@ -48,6 +48,8 @@
 #
 # Repo: https://github.com/ohdns/centos7_simple_kickstart.git
 #
+umask 007
+#
 PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS:/bin:/sbin:/usr/bin:/usr/sbin
 VM0="c7_small_kickstart"
 export PATH USER VM0
@@ -132,33 +134,39 @@ sync
 
 
 ######################################### CENTOS EPEL Repo exist? Repo current? If not, create or update it.
-RECENTSYNC=`find ${HOME}/build/centos7_simple_kickstart/www/html/mirror/ -name localsync.log -mtime -7 -type f 2>/dev/null | grep -c localsync`
-if [ ! -d ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/updates ] || [ ${RECENTSYNC} -lt 1 ] ; then
+printf "\n\nSyncing Public to Local Repo Copies.\n\nIMPORTANT: Avoid running this more than 4 times per day from your network to avoid being blocked.\n\n";sleep 4
+mkdir -p ${HOME}/build/centos7_simple_kickstart/etc
+mkdir -p ${HOME}/build/centos7_simple_kickstart/scripts
+mkdir -p ${HOME}/build/centos7_simple_kickstart/tmp
+mkdir -p ${HOME}/build/centos7_simple_kickstart/log
+mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/isos/x86_64
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/updates/x86_64
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/extras/x86_64
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/epel/7/x86_64
-mkdir -p ${HOME}/build/centos7_simple_kickstart/scripts ${HOME}/build/centos7_simple_kickstart/isos
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/docker_images
-chmod 755 ${HOME}/build/centos7_simple_kickstart/www/html/mirror/docker_images
+#
+# rsync command and arguments.
+RS="rsync -avH --progress --delay-updates --delete --delete-after --exclude=repoview/ --exclude=debug/ --exclude=drpms/";export RS
 #
 # CENTOS
-rsync -auvH --progress --delay-updates --delete --delete-after mirrors.kernel.org::centos/7/isos/CentOS*Minimal*.iso ~/build/centos7_simple_kickstart/isos/.
-rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ --exclude=drpms/ mirrors.kernel.org::centos/7/os/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64/.
-rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ --exclude=drpms/ mirrors.kernel.org::centos/7/updates/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/updates/x86_64/.
-rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ --exclude=drpms/ mirrors.kernel.org::centos/7/extras/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/extras/x86_64/.
-##  EPEL
-##  Comment out the next line if you do NOT want a copy of the EPEL repo.  It is about 8GB.
-rsync -auvH --progress --delay-updates --delete --delete-after --exclude=debug/ --exclude=drpms/ mirrors.cat.pdx.edu::fedora-epel/7/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/epel/7/x86_64/.
+${RS} mirrors.kernel.org::centos/7/isos/x86_64/CentOS*NetInstall*.iso ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/isos/x86_64/.
+${RS} mirrors.kernel.org::centos/7/os/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64/.
+${RS} mirrors.kernel.org::centos/7/updates/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/updates/x86_64/.
+${RS} mirrors.kernel.org::centos/7/extras/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/extras/x86_64/.
 #
-date >> ${HOME}/build/centos7_simple_kickstart/www/html/mirror/localsync.log 
+##  EPEL
+##  Comment out the next line if you do NOT want a copy of the Fedora EPEL repo.  It is about 8GB.
+${RS} mirrors.cat.pdx.edu::fedora-epel/7/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/epel/7/x86_64/.
+
+exit 0;
 #
 curl -A Mozilla -s https://wiki.centos.org/Manuals/ReleaseNotes/CentOS7 -o ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html
-shasum -a 256 ${HOME}/build/centos7_simple_kickstart/isos/CentOS*Minimal*.iso > ${HOME}/build/centos7_simple_kickstart/isos/.validate_iso.txt
-NOTESUM=`egrep "CentOS.*Minimal.*\.iso" ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html | awk -F ">" {'print $3'} | awk {'print $1'}`
-LOCALSUM=`awk {'print $1'} ${HOME}/build/centos7_simple_kickstart/isos/.validate_iso.txt`
+shasum -a 256 ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS*netInstal*.iso > ${HOME}/build/centos7_simple_kickstart/isos/x86_64/.validate_iso.txt
+NOTESUM=`egrep "CentOS.*NetInsta.*\.iso" ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html | awk -F ">" {'print $3'} | awk {'print $1'}`
+LOCALSUM=`awk {'print $1'} ${HOME}/build/centos7_simple_kickstart/isos/x86_64/.validate_iso.txt`
 printf "\n\nChecksum of ISO from centos.org: ${NOTESUM}\nChecksum of Local ISO: ${LOCALSUM}\n\n"
-fi
+#
 #
 # DO NOT GET THESE FILES FROM A MIRROR.  Sorry, centos.org doesn't provide https on this site, derp.
 if [ ! -f ${HOME}/build/centos7_simple_kickstart/www/html/mirror/RPM-GPG-KEY-CentOS-7 ] ; then
@@ -331,12 +339,12 @@ VBoxManage storageattach ${VM0} --storagectl mysata --port 1 --medium ${HOME}/bu
 fi
 #
 
-if [ -f ${HOME}/build/centos7_simple_kickstart/isos/CentOS-7-x86_64-NetInstall-1503.iso ] ; then
+if [ -f ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS-7-x86_64-NetInstall-1503.iso ] ; then
 VBoxManage storagectl ${VM0} --name myide --add ide --controller PIIX4 --portcount 2 --hostiocache on
-VBoxManage storageattach ${VM0} --storagectl myide --port 0 --device 0 --type dvddrive --medium ${HOME}/build/centos7_simple_kickstart/isos/CentOS-7-x86_64-NetInstall-1503.iso --type dvddrive --tempeject on
+VBoxManage storageattach ${VM0} --storagectl myide --port 0 --device 0 --type dvddrive --medium ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS-7-x86_64-NetInstall-1503.iso --type dvddrive --tempeject on
 else
-printf "\n\nThe NetInstall ISO ${HOME}/build/centos7_simple_kickstart/isos/CentOS-7-x86_64-NetInstall-1503.iso we expected appears to be missing.\n\n"
-ls -anhnto ${HOME}/build/centos7_simple_kickstart/isos/*NetInstall*iso
+printf "\n\nThe NetInstall ISO ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS-7-x86_64-NetInstall-1503.iso we expected appears to be missing.\n\n"
+ls -anhnto ${HOME}/build/centos7_simple_kickstart/isos/x86_64/*NetInstall*iso
 exit 2
 fi
 
