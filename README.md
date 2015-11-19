@@ -34,6 +34,9 @@ ___
 
 # Steps
 <p>
+In these steps, we will be syncing the public CentOS and Fedora EPEL repos to a staging location on your laptop, then starting a local low privileged instance of rsync and apache on your private vboxnet interface.<br /><br />
+From there, the kickstart process will read your kickstart configuration files and build the first VM, using the files from your laptop. After the first VM is built, all future VM's will then be built directly from your "kickstart server" VM from step2.<br /><br />
+
 <ul>
 <li><b><font color="#960000">Install</b></font> VirtualBox if you have not done so already.  See virtualbox.org</li>
 
@@ -148,4 +151,4 @@ Power On Headless (No GUI / console):<br />
 ___
 <p><b><br />Disclaimer: This repo contains scripts that are for educational purposes only.  This repo contains default passwords and ssh public keys that must not be used anywhere beyond VirtualBox on your laptop for educational purposes only. DO NOT use this to deploy a production environment unless you have properly changed all defaults, changed settings to reflect that which is approved for your environment and have properly tested this in a lab and staging area that matches your live environments.  The author of these scripts assumes no responsibility for damages to persons or property.<br /><br /></b><br /></p>
 ___
-<i>20151117</i>
+<i>20151119</i>
