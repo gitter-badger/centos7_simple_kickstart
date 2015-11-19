@@ -18,7 +18,7 @@
 #
 # Author: Aaron W. <githubspam@ohdns.org>
 #
-# do litle harm.
+# do little harm.
 /usr/bin/renice 19 -p $$ > /dev/null 2>&1
 #
 #  This script assumes that:
@@ -48,10 +48,46 @@
 #
 # Repo: https://github.com/ohdns/centos7_simple_kickstart.git
 #
-PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS
-MYNAME="c7_small_"
-YOURNUMBER="$1"
-export PATH USER MYNAME YOURNUMBER
+umask 007
+#
+PATH=${PATH}:/Applications/VirtualBox.app/Contents/MacOS:/bin:/sbin:/usr/bin:/usr/sbin
+VM0="c7_small_kickstart"
+export PATH USER VM0
+
+
+
+# Leaving some mental notes here so you can see where I was going with automating the full setup.
+# This is not likely required for most people, as I am lazier than most.
+# MOST of the manual steps in this file will move into Ansible.
+
+
+
+######################################### Modify NetInstall ISO to grab our kickstart file automagically.
+# maybe replace this in the NetInstall ISO:
+#
+#  linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 quiet
+# with
+#  linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 cmdline nicdelay=10 ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg
+#
+######################################### Modify NetInstall ISO to grab our kickstart file automagically.
+
+#########################################  OR
+
+#########################################  Local PXE in VirtualBox to bootstrap the first KS VM automagically
+#mkdir -p ${HOME}/.VirtualBox/TFTP/pxelinux.cfg ${HOME}/.VirtualBox/TFTP/netboot
+#cp ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64/isolinux/* ${HOME}/.VirtualBox/TFTP/
+#
+# yuck, this is actually harder than just typing one line.  what a mess.
+#########################################  Local PXE in VirtualBox to bootstrap the first KS VM automagically
+
+#########################################  OR
+
+######################################### Convert the NetBoot ISO into a disk image, some day maybe.
+#if [ ! -s ~/build/centos7_simple_kickstart/isos/c7netboot.vdi ] ; then
+#VBoxManage convertfromraw -format VDI ~/build/centos7_simple_kickstart/isos/c7netboot.iso ~/build/centos7_simple_kickstart/isos/c7netboot.vdi
+#fi
+######################################### Convert the NetBoot ISO into a disk image, some day maybe.
+
 
 
 
@@ -92,61 +128,186 @@ sync
 ######################################### Create vboxnet local interface
 
 
-######################################### Validate Input
-NUMBER_VALIDATE=`echo "${YOURNUMBER}" | egrep -c "^[0-9]{1,2}$"`
-if [ ${NUMBER_VALIDATE} -lt 1 ] || [ ${NUMBER_VALIDATE} -gt 1 ] ; then
-printf "\n\nI see ${NUMBER_VALIDATE} valid numbers in ${YOURNUMBER}\n\nPlease select a positive integer between 1 and 64.\n\n"
-exit 2
+
+
+######################################### Configure TFTP, but this is also messy and requires installing more 3rd party crap.
+#mkdir -p ${HOME}/.VirtualBox/TFTP/pxelinux.cfg ${HOME}/.VirtualBox/TFTP/netboot
+#cp ~/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64/isolinux/* ${HOME}/.VirtualBox/TFTP/
+#
+# yuck, this is actually harder than just typing one line.  what a mess.
+######################################### Configure TFTP, but this is also messy and requires installing more 3rd party crap.
+
+
+
+
+
+######################################### Start local web server on ${OURHOSTONLYIF}
+mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html
+mkdir -p ${HOME}/build/centos7_simple_kickstart/logs
+mkdir -p ${HOME}/build/centos7_simple_kickstart/tmp
+mkdir -p ${HOME}/build/centos7_simple_kickstart/etc
+chmod 0755 ${HOME}/build/centos7_simple_kickstart/www/html
+chmod 0700 ${HOME}/build/centos7_simple_kickstart/tmp
+chmod 0700 ${HOME}/build/centos7_simple_kickstart/etc
+cp ${HOME}/build/centos7_simple_kickstart/scripts/c7*cfg ${HOME}/build/centos7_simple_kickstart/www/html/
+chmod 0644 ${HOME}/build/centos7_simple_kickstart/www/html/c7*cfg
+
+cat << zzzAPACHEzzz > ${HOME}/build/centos7_simple_kickstart/etc/httpd.conf
+ServerTokens prod
+PidFile ${HOME}/build/centos7_simple_kickstart/tmp/httpd.pid
+ScoreBoardFile ${HOME}/build/centos7_simple_kickstart/tmp/.scoreboard
+KeepAlive off
+ServerRoot "/usr"
+Listen 192.168.120.1:8888
+LoadModule authz_core_module libexec/apache2/mod_authz_core.so
+LoadModule log_config_module libexec/apache2/mod_log_config.so
+LoadModule env_module libexec/apache2/mod_env.so
+LoadModule setenvif_module libexec/apache2/mod_setenvif.so
+LoadModule autoindex_module libexec/apache2/mod_autoindex.so
+LoadModule dir_module libexec/apache2/mod_dir.so
+LoadModule alias_module libexec/apache2/mod_alias.so
+LoadModule unixd_module libexec/apache2/mod_unixd.so
+Mutex sem
+ServerAdmin root@localhost
+ServerName 192.168.120.1
+ServerLimit 10240
+DirectoryIndex index.html
+DocumentRoot "${HOME}/build/centos7_simple_kickstart/www/html"
+<Directory "${HOME}/build/centos7_simple_kickstart/www">
+options indexes
+</Directory>
+ErrorLog "${HOME}/build/centos7_simple_kickstart/logs/error.log"
+LogLevel warn
+LogFormat "%h %l %u %t \"%r\" %>s %b" common
+CustomLog "${HOME}/build/centos7_simple_kickstart/logs/access.log" common
+TraceEnable off
+HostnameLookups off
+ServerSignature off
+EnableMMAP off
+EnableSendfile off
+
+zzzAPACHEzzz
+
+
+# -9 is safe here
+if [ -s ${HOME}/build/centos7_simple_kickstart/httpd.pid ] ; then
+kill -9 `cat ${HOME}/build/centos7_simple_kickstart/httpd.pid` && rm -f ${HOME}/build/centos7_simple_kickstart/httpd.pid
 fi
-
-if [ ${YOURNUMBER} -gt 64 ] ; then
-printf "\n\nYou are asking to create more than 64 VM's.  Something is probably wrong.  Refusing to run.\n\n"
-exit 2
-fi
-######################################### Validate Input
-
-
-######################################### Create small VM
-# VM1, small VMs
-# Lets background these and just hope we dont nuke your poor CPU and disk.
-for MYNUMBER in `seq -w ${YOURNUMBER}`
+sync
+sleep 1
+printf "\nStarting Local Apache Listener:  "
+for patchy in `seq 7`
 do
-
-if [ ! -f ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi ] ; then
-printf "\n\nCreating ${MYNAME}${MYNUMBER} in base folder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}\n\n"
-mkdir -p ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}
-VBoxManage createvm --name ${MYNAME}${MYNUMBER} --ostype RedHat_64 --basefolder ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER} --register
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --vrde off
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --usb off
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --clipboard disabled
-# THIS REQUIRES Headless Start # VBoxManage modifyvm ${MYNAME}${MYNUMBER} --graphicscontroller none
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --memory 1200 --vram 12 --cpus 2 --cpuexecutioncap 90
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --firmware bios
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --audio none --chipset ich9
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nic1 hostonly --hostonlyadapter1 ${OURHOSTONLYIF} --nictype1 82545EM --macaddress1 auto
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nicpromisc1 allow-all
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --nicbootprio1 1
-VBoxManage modifyvm ${MYNAME}${MYNUMBER} --boot1 disk --boot2 net --boot3 none --boot4 none
-VBoxManage storagectl ${MYNAME}${MYNUMBER} --name mysata --add sata --controller IntelAHCI --portcount 2 --hostiocache off
-VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi" --size 3072 --variant Fixed
-VBoxManage storageattach ${MYNAME}${MYNUMBER} --storagectl mysata --port 0 --medium ${HOME}/build/centos7_simple_kickstart/vm/${MYNAME}${MYNUMBER}/${MYNAME}${MYNUMBER}_os.vdi --type hdd
-fi
-
-######################################### Create small VM
-
-VBoxManage startvm ${MYNAME}${MYNUMBER} &
-printf "\n\n"
-
+ APACHECOUNT=`sleep 1;sync;netstat -an | grep LISTEN | grep -c 8888`
+ if [ ${APACHECOUNT} -lt 1 ] ; then
+ #/usr/sbin/httpd -T -f ${HOME}/build/centos7_simple_kickstart/etc/httpd.conf -E ${HOME}/build/centos7_simple_kickstart/logs/apache_startup.log -k start
+ /usr/sbin/httpd -T -f ${HOME}/build/centos7_simple_kickstart/etc/httpd.conf -k start
+ sleep ${patchy}
+ printf "."
+ fi
 done
+#
+######################################### Start local web server on ${OURHOSTONLYIF}
+
+
+
+######################################### Start local rsync server on ${OURHOSTONLYIF}
+cat << zzzRSYNCzzz > ${HOME}/build/centos7_simple_kickstart/etc/rsyncd.conf
+uid = ${USER}
+use chroot = no
+max connections = 127
+lock file = ${HOME}/build/centos7_simple_kickstart/tmp/rsyncd.lock
+log file = ${HOME}/build/centos7_simple_kickstart/logs/rsyncd.log
+pid file = ${HOME}/build/centos7_simple_kickstart/tmp/rsyncd.pid 
+syslog facility = local5
+strict modes = false
+hosts allow = 192.168.120.0/24
+reverse lookup = no
+timeout = 30
+dont compress = *.gz *.tgz *.zip *.rpm *.bz2 *.7z *.rar *.jp* *.gif *.png *.mp*
+#refuse options = checksum delete
+refuse options = delete
+[www]
+list = true
+comment = "www"
+path = ${HOME}/build/centos7_simple_kickstart/www
+read only = yes
+
+zzzRSYNCzzz
+
+sync
+if [ -s ${HOME}/build/centos7_simple_kickstart/tmp/rsyncd.pid ] ; then
+kill -9 `cat ${HOME}/build/centos7_simple_kickstart/tmp/rsyncd.pid && rm -f ${HOME}/build/centos7_simple_kickstart/tmp/rsyncd.pid`
+fi
+sync
+sleep 1
+printf "\nStarting Local RSYNCD Listener:  "
+for mysync in `seq 7`
+do
+RSYNCRUNNING=`sleep 1;sync;netstat -an | grep LISTEN | grep -c 10873`
+if [ ${RSYNCRUNNING} -lt 1 ] ; then
+rm -f ${HOME}/build/centos7_simple_kickstart/tmp/rsync*
+rsync --daemon --ipv4 --address=192.168.120.1 --port=10873 --config=${HOME}/build/centos7_simple_kickstart/etc/rsyncd.conf
+sync
+sleep ${mysync}
+printf "."
+fi
+done
+######################################### Start local rsync server on ${OURHOSTONLYIF}
+
+
+
+######################################### Create kickstart server VM
+# VM0, small kickstart VM with CentOS and EPEL repos, DHCPD, TFTP, HTTPD
+if [ ! -f ${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_os.vdi ] ; then
+mkdir -p ${HOME}/build/centos7_simple_kickstart/vm/${VM0}
+printf "\n\nCreating ${VM0} in base folder ${HOME}/build/centos7_simple_kickstart/vm/${VM0}\n\n"
+VBoxManage createvm --name ${VM0} --ostype RedHat_64 --basefolder ${HOME}/build/centos7_simple_kickstart/vm/${VM0} --register
+VBoxManage modifyvm ${VM0} --vrde off
+VBoxManage modifyvm ${VM0} --usb off
+VBoxManage modifyvm ${VM0} --clipboard disabled
+#VBoxManage modifyvm ${VM0} --graphicscontroller none # must boot headless to use this
+VBoxManage modifyvm ${VM0} --memory 1200 --vram 12 --cpus 2 --cpuexecutioncap 90
+VBoxManage modifyvm ${VM0} --firmware bios
+VBoxManage modifyvm ${VM0} --audio none --chipset ich9
+VBoxManage modifyvm ${VM0} --nic1 hostonly --hostonlyadapter1 ${OURHOSTONLYIF} --nictype1 82545EM --macaddress1 auto
+#VBoxManage modifyvm ${VM0} --nic2 intnet  --nictype2 82545EM --macaddress2 auto
+VBoxManage modifyvm ${VM0} --nicpromisc1 allow-all
+VBoxManage modifyvm ${VM0} --biospxedebug off
+VBoxManage modifyvm ${VM0} --nicbootprio1 1
+VBoxManage modifyvm ${VM0} --boot1 disk --boot2 dvd --boot3 none --boot4 none
+VBoxManage storagectl ${VM0} --name mysata --add sata --controller IntelAHCI --portcount 2 --hostiocache off
+VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_os.vdi" --size 3072 --variant Fixed
+VBoxManage storageattach ${VM0} --storagectl mysata --port 0 --medium ${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_os.vdi --type hdd
+VBoxManage createhd --filename "${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_www.vdi" --size 30742 --variant Fixed
+VBoxManage storageattach ${VM0} --storagectl mysata --port 1 --medium ${HOME}/build/centos7_simple_kickstart/vm/${VM0}/${VM0}_www.vdi --type hdd
+fi
+#
+
+if [ -f ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS-7-x86_64-NetInstall-1503.iso ] ; then
+VBoxManage storagectl ${VM0} --name myide --add ide --controller PIIX4 --portcount 2 --hostiocache on
+VBoxManage storageattach ${VM0} --storagectl myide --port 0 --device 0 --type dvddrive --medium ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS-7-x86_64-NetInstall-1503.iso --type dvddrive --tempeject on
+else
+printf "\n\nThe NetInstall ISO ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS-7-x86_64-NetInstall-1503.iso we expected appears to be missing.\n\n"
+ls -anhnto ${HOME}/build/centos7_simple_kickstart/isos/x86_64/*NetInstall*iso
+exit 2
+fi
 
 #
-# VBoxHeadless --startvm ${MYNAME}${MYNUMBER} --boot1 net
-# VBoxManage controlvm ${MYNAME}${MYNUMBER} poweron
-# VBoxManage modifyvm ${MYNAME}${MYNUMBER} --dvd none
-# VBoxManage controlvm ${MYNAME}${MYNUMBER} poweroff
+######################################### Create kickstart server VM
 
 
-exit 0;
+VBoxManage startvm ${VM0}
+
+printf "\n\nWhen the ISO boots, hit the TAB key, backspace over \"quiet\" and type:\n\tcmdline ip=192.168.120.10 netmask=255.255.255.0 ks=http://192.168.120.1:8888/c7_ks.cfg\n\n"
+
+printf "\nReminder: the post install section will take a while as it is copying data from your mac yum repos.\n"
+
+
+exit 0
+
+
+
 
 
 # generate MAC ourselves so we can use it later if we need it.
