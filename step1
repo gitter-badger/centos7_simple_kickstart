@@ -105,7 +105,7 @@ mkdir -p ${HOME}/build/centos7_simple_kickstart/etc
 mkdir -p ${HOME}/build/centos7_simple_kickstart/scripts
 mkdir -p ${HOME}/build/centos7_simple_kickstart/tmp
 mkdir -p ${HOME}/build/centos7_simple_kickstart/log
-mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/isos/x86_64
+mkdir -p ${HOME}/build/centos7_simple_kickstart/isos
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/updates/x86_64
 mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/extras/x86_64
@@ -116,7 +116,7 @@ mkdir -p ${HOME}/build/centos7_simple_kickstart/www/html/mirror/docker_images
 RS="rsync -avH --progress --delay-updates --delete --delete-after --exclude=repoview/ --exclude=debug/ --exclude=drpms/";export RS
 #
 # CENTOS
-${RS} mirrors.kernel.org::centos/7/isos/x86_64/CentOS*NetInstall*.iso ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/isos/x86_64/.
+${RS} mirrors.kernel.org::centos/7/isos/x86_64/CentOS*NetInstall*.iso ${HOME}/build/centos7_simple_kickstart/isos/x86_64/.
 ${RS} mirrors.kernel.org::centos/7/os/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/os/x86_64/.
 ${RS} mirrors.kernel.org::centos/7/updates/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/updates/x86_64/.
 ${RS} mirrors.kernel.org::centos/7/extras/x86_64/. ${HOME}/build/centos7_simple_kickstart/www/html/mirror/centos/7/extras/x86_64/.
@@ -127,7 +127,7 @@ ${RS} mirrors.cat.pdx.edu::fedora-epel/7/x86_64/. ${HOME}/build/centos7_simple_k
 
 #
 curl -A Mozilla -s https://wiki.centos.org/Manuals/ReleaseNotes/CentOS7 -o ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html
-shasum -a 256 ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS*netInstal*.iso > ${HOME}/build/centos7_simple_kickstart/isos/x86_64/.validate_iso.txt
+shasum -a 256 ${HOME}/build/centos7_simple_kickstart/isos/x86_64/CentOS*NetInsta*.iso > ${HOME}/build/centos7_simple_kickstart/isos/x86_64/.validate_iso.txt
 NOTESUM=`egrep "CentOS.*NetInsta.*\.iso" ${HOME}/build/centos7_simple_kickstart/www/html/mirror/c7_notes.html | awk -F ">" {'print $3'} | awk {'print $1'}`
 LOCALSUM=`awk {'print $1'} ${HOME}/build/centos7_simple_kickstart/isos/x86_64/.validate_iso.txt`
 printf "\n\nChecksum of ISO from centos.org: ${NOTESUM}\nChecksum of Local ISO: ${LOCALSUM}\n\n"
