@@ -96,6 +96,9 @@ sync
 
 
 
+# Validate GPG Signatures:  https://www.centos.org/keys/#centos-7-keys
+# Perhaps a location to get GPG keys over HTTPS from a non mirror:  https://git.centos.org/repositories/
+# Discuss GPG keys:  https://www.centos.org/community/calendar/#list
 
 
 
