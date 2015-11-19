@@ -64,6 +64,12 @@ You <i>should</i> replace the SSH Public Key in the misc c7.cfg files with your 
 <li>
  <b>Execute</b> <code>~/build/centos7_simple_kickstart/scripts/step1</code>
 <br /><br />
+This step will rsync the CentOS and Fedora EPEL repos to your laptop in a staging location.<br />
+</li>
+
+<li>
+ <b>Execute</b> <code>~/build/centos7_simple_kickstart/scripts/step2</code>
+<br /><br />
 This step will perform the following:<br />
 Sync the public CentOS and EPEL repo to your laptop<br />
 Start up a local apache instance on 192.168.120.1 on a new private network of 192.168.120.0/24<br />
