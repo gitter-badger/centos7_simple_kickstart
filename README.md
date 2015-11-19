@@ -128,11 +128,13 @@ ___
 
 <li>SUB-OPTIMAL: There is one manual step to create the DHCP/PXE/Yum/Kickstart server.  This is <i>probably</i> ok, since we should not be doing this often.</li>
 
-<li>SUB-OPTIMAL: This method currently lacks end-to-end validation of the RPM GPG signatures.  (Work In Progress)</li>
+<li>SUB-OPTIMAL: This method currently lacks end-to-end validation of the RPM GPG signatures.  (Work In Progress, Contacting CentOS Team.)</li>
 
 <li>TO-DO: You will need to manually add your SSH public key in the ~/build/centos7_simple_kickstart/scripts/c7*cfg files so that you may SSH as the Automation user (ohadmin). I will eventually look for a file, or ask your permission to incorporate your existing public SSH key.  This comes with some risk.</li>
 
 <li>TO-DO: There is currently a bit of customization in the kickstart files.  Much of this will be moved into automation as this document and repo evolve to include managing these hosts with automation and orchestration services.</li>
+
+<li>TO-DO: Merge all the steps into 1 script as functions.  It was just easier to maintain them in the initial development stage this way.</li>
 
 <li>WORKS AS DESIGNED: I renice this script to avoid blocking any work you are doing. This means if your laptop is under a heavy load, this kickstart build process may go very slow by design.</li>
 
