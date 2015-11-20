@@ -1,5 +1,7 @@
 # CentOS 7 Simple Kickstart
 
+[![Join the chat at https://gitter.im/ohdns/centos7_simple_kickstart](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ohdns/centos7_simple_kickstart?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # Goals:
 <p>
 <ul>
